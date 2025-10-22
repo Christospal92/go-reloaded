@@ -167,10 +167,3 @@ This project blends **learning** and **delivery**.
 Each Agile cycle builds both **working code** and **understanding**.  
 AI agents are expected not only to code — but to **explain, justify, and evolve** the system design as they proceed.
 
----
-
-> “Build it like a machine.  
-> Explain it like a mentor.  
-> Learn from it like a student.”  
-> — Go-Reloaded Team
-
