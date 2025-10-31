@@ -11,9 +11,8 @@ func ApplyFormat(tokens []Token) []Token {
 	return toks
 }
 
-// ----------------------------------------------------
-// helper 1: attachPunctuation
-// ----------------------------------------------------
+// attachPunctuation makes punctuation stick to the previous token
+// and ensures space after it when needed.
 func attachPunctuation(tokens []Token) []Token {
 	out := make([]Token, 0, len(tokens))
 
@@ -32,13 +31,22 @@ func attachPunctuation(tokens []Token) []Token {
 		}
 		out = append(out, t)
 
-		// δες τι έρχεται μετά
+		// τώρα δες τι έρχεται μετά
 		if i+1 < len(tokens) {
 			next := tokens[i+1]
+
+			// 🔴 PATCH: αν έχουμε "?" ή "!" και μετά ".", πετάμε την τελεία
+			if (t.Value == "?" || t.Value == "!") && next.Type == Punctuation && next.Value == "." {
+				// απλά προσπερνάμε την τελεία
+				i++ // skip the "."
+				// και ΔΕΝ βάζουμε space εδώ, γιατί ήδη το ? είναι στο τέλος πρότασης
+				continue
+			}
 
 			// αν είναι space + μετά punctuation → μην βάλεις space
 			if next.Type == Space {
 				if i+2 < len(tokens) && tokens[i+2].Type == Punctuation {
+					// π.χ. "BAMM !!"
 					i++ // τρώμε το space
 					continue
 				}
@@ -57,9 +65,7 @@ func attachPunctuation(tokens []Token) []Token {
 	return out
 }
 
-// ----------------------------------------------------
-// helper 2: fixQuotes
-// ----------------------------------------------------
+// fixQuotes trims spaces right after opening quote and right before closing quote.
 func fixQuotes(tokens []Token) []Token {
 	out := make([]Token, 0, len(tokens))
 
