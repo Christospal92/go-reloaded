@@ -91,6 +91,7 @@ go-reloaded/
  ├─ tests/
  │   └─ golden/              # Input/output/result test pairs
  ├─ README.md
+ ├─ golden tests.md
  ├─ analysis.md
  ├─ prompt.md
  └─ agents.md
