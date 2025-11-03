@@ -8,6 +8,8 @@ func ApplyFormat(tokens []Token) []Token {
 	// 2) μετά διορθώνουμε τα quotes
 	toks = fixQuotes(toks)
 
+	// 3) συμπίεση κενών (ΝΕΟ)
+	toks = compressSpaces(toks)
 	return toks
 }
 
@@ -19,44 +21,74 @@ func attachPunctuation(tokens []Token) []Token {
 	for i := 0; i < len(tokens); i++ {
 		t := tokens[i]
 
-		// αν δεν είναι punctuation, απλά το περνάμε
+		// 1) Ό,τι δεν είναι punctuation περνάει όπως είναι
 		if t.Type != Punctuation {
 			out = append(out, t)
 			continue
 		}
 
-		// είναι punctuation: πρέπει να κολλήσει στο προηγούμενο
-		if len(out) > 0 && out[len(out)-1].Type == Space {
-			out = out[:len(out)-1]
+		// 2) ΠΡΙΝ βάλουμε punctuation, καθάρισε ΟΛΑ τα προηγούμενα spaces
+		//    ΕΚΤΟΣ από την ειδική περίπτωση ": " πριν από opening quote (')
+		if t.Value == "'" {
+			// διατήρησε το space αν ακριβώς πριν είναι ":" + space
+			if !(len(out) >= 2 &&
+				out[len(out)-1].Type == Space &&
+				out[len(out)-2].Type == Punctuation && out[len(out)-2].Value == ":") {
+				for len(out) > 0 && out[len(out)-1].Type == Space {
+					out = out[:len(out)-1]
+				}
+			}
+		} else {
+			for len(out) > 0 && out[len(out)-1].Type == Space {
+				out = out[:len(out)-1]
+			}
 		}
+
+		// 3) Πρόσθεσε το τρέχον punctuation
 		out = append(out, t)
 
-		// τώρα δες τι έρχεται μετά
+		// 4) Ειδικός κανόνας για το ":" → ΠΑΝΤΑ ακριβώς ένα space μετά
+		if t.Value == ":" {
+			// αν το επόμενο token είναι Space → κατανάλωσέ το
+			if i+1 < len(tokens) && tokens[i+1].Type == Space {
+				i++
+			}
+			// βάλε ΑΚΡΙΒΩΣ ένα space μετά από ':'
+			out = append(out, Token{Value: " ", Type: Space})
+			// προχώρα στον επόμενο κύκλο (μην εφαρμόσεις άλλο spacing logic)
+			continue
+		}
+
+		// 5) Αν υπάρχει επόμενο token, δες πώς θα χειριστείς spacing/ιδιαιτερότητες
 		if i+1 < len(tokens) {
 			next := tokens[i+1]
 
-			// 🔴 PATCH: αν έχουμε "?" ή "!" και μετά ".", πετάμε την τελεία
+			// (A) "?." ή "!." → πέτα την τελεία
 			if (t.Value == "?" || t.Value == "!") && next.Type == Punctuation && next.Value == "." {
-				// απλά προσπερνάμε την τελεία
-				i++ // skip the "."
-				// και ΔΕΝ βάζουμε space εδώ, γιατί ήδη το ? είναι στο τέλος πρότασης
+				i++ // skip "."
 				continue
 			}
 
-			// αν είναι space + μετά punctuation → μην βάλεις space
+			// (B) Γενικός κανόνας spacing ανάλογα με το επόμενο token
 			if next.Type == Space {
-				if i+2 < len(tokens) && tokens[i+2].Type == Punctuation {
-					// π.χ. "BAMM !!"
-					i++ // τρώμε το space
+				// Αν μετά το space ακολουθεί punctuation ΚΑΙ ΔΕΝ είναι opening quote,
+				// κόψε το space (π.χ. "BAMM !!")
+				if i+2 < len(tokens) && tokens[i+2].Type == Punctuation && tokens[i+2].Value != "'" {
+					i++ // φάε το space
 					continue
 				}
-				// κανονική περίπτωση: space μετά το punctuation
+				// αλλιώς κράτα ΕΝΑ space
 				i++
 				out = append(out, Token{Value: " ", Type: Space})
+
 			} else if next.Type == Punctuation {
-				// ακολουθεί άλλο punctuation → δεν βάζουμε space
+				// ΕΞΑΙΡΕΣΗ: αν αμέσως μετά ακολουθεί opening quote ('), βάλε space πριν από το quote
+				if next.Value == "'" {
+					out = append(out, Token{Value: " ", Type: Space})
+				}
+				// διαφορετικά: δεν βάζουμε space (για "!!", "...", "!?")
 			} else {
-				// ακολουθεί word → βάλε space
+				// επόμενο είναι λέξη → βάλε space
 				out = append(out, Token{Value: " ", Type: Space})
 			}
 		}
@@ -108,5 +140,35 @@ func fixQuotes(tokens []Token) []Token {
 		}
 	}
 
+	return out
+}
+
+// compressSpaces merges consecutive Space tokens into a single one
+// and trims leading/trailing spaces.
+func compressSpaces(tokens []Token) []Token {
+	out := make([]Token, 0, len(tokens))
+	prevSpace := false
+
+	for _, tk := range tokens {
+		if tk.Type == Space {
+			// skip leading space
+			if len(out) == 0 {
+				continue
+			}
+			// collapse multiple spaces
+			if prevSpace {
+				continue
+			}
+			out = append(out, tk)
+			prevSpace = true
+		} else {
+			out = append(out, tk)
+			prevSpace = false
+		}
+	}
+	// trim trailing space
+	if len(out) > 0 && out[len(out)-1].Type == Space {
+		out = out[:len(out)-1]
+	}
 	return out
 }

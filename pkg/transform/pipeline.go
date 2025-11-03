@@ -11,9 +11,8 @@ func Transform(input string) string {
 	tokens = ApplyNumbers(tokens)
 	tokens = ApplyCasing(tokens)
 	tokens = ApplyArticles(tokens)
-	tokens = ApplyFormat(tokens)
 
-	// 3) remove any leftover directives (safety)
+	// 3) remove any leftover directives (safety) — πριν το format
 	clean := make([]Token, 0, len(tokens))
 	for _, tk := range tokens {
 		if tk.Type == Directive {
@@ -22,31 +21,26 @@ func Transform(input string) string {
 		clean = append(clean, tk)
 	}
 
-	// 4) turn tokens back into string
+	// 4) format (punctuation, quotes, spaces)
+	clean = ApplyFormat(clean)
+
+	// 5) turn tokens back into string
 	return Detokenize(clean)
 }
 
 // Detokenize converts tokens back into a string.
-// We assume that Format has already fixed spaces around punctuation,
-// so here we just join respecting Space tokens.
+// Γράφει ακριβώς ένα space για κάθε Space token
+// και απλώς ενώνει τα υπόλοιπα όπως είναι.
 func Detokenize(tokens []Token) string {
 	var sb strings.Builder
 
-	for i, tk := range tokens {
-		switch tk.Type {
-		case Space:
-			// avoid double spaces
-			if sb.Len() > 0 {
-				sb.WriteString(" ")
-			}
-		default:
-			sb.WriteString(tk.Value)
-
-			// optional: if next is Word and current is Word, add space
-			if i+1 < len(tokens) && tokens[i+1].Type == Word && tk.Type == Word {
-				sb.WriteString(" ")
-			}
+	for _, tk := range tokens {
+		if tk.Type == Space {
+			// γράψε ένα και μόνο space
+			sb.WriteByte(' ')
+			continue
 		}
+		sb.WriteString(tk.Value)
 	}
 
 	return strings.TrimSpace(sb.String())
