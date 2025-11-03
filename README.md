@@ -12,6 +12,13 @@ and produces an **exactly formatted output** file.
 directives and context rules. It reads an input file (e.g., `sample.txt`)  
 and produces a corrected output file (`result.txt`).
 
+## 🏃‍♂️ Run
+
+To run the program on any text file:
+
+```bash
+go run ./cmd/go-reloaded input.txt output.txt
+
 ### Example Usage
 
 ```bash
@@ -82,7 +89,7 @@ go-reloaded/
  │        ├─ pipeline.go
  │        └─ types.go
  ├─ tests/
- │   └─ golden/              # Input/output test pairs
+ │   └─ golden/              # Input/output/result test pairs
  ├─ README.md
  ├─ analysis.md
  ├─ prompt.md

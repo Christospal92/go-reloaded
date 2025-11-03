@@ -63,12 +63,15 @@ func parseCasingDirective(s string) (string, int, bool) {
 		return "", 0, false
 	}
 
+	// default: 1 only if no number is provided
 	count := 1
 	if len(parts) == 2 {
 		val := strings.TrimSpace(parts[1])
-		n, err := strconv.Atoi(val)
-		if err == nil && n > 0 {
+		if n, err := strconv.Atoi(val); err == nil && n >= 0 {
+			// respect 0 as a valid count
 			count = n
+		} else {
+			// parsing failed -> keep default 1
 		}
 	}
 

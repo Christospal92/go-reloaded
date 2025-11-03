@@ -133,3 +133,23 @@ Expected: Don not be sad, because sad backwards is das. And das not good.
 Input: harold wilson (cap, 2) : ' I am a optimist ,but a optimist who carries a raincoat . '
 Expected: Harold Wilson: 'I am an optimist, but an optimist who carries a raincoat.'
 ```
+
+## Edge cases Examples
+
+**Example 21**
+```
+Input: This stays the same (up, 0)
+Expected: This stays the same
+```
+
+**Example 22**
+```
+Input: He said: '  '
+Expected: He said: ''
+```
+
+**Example 23**
+```
+Input: Go BIG Or Go Home (low, 10) !
+Expected: go big or go home!
+```
