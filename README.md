@@ -98,6 +98,30 @@ go-reloaded/
 
 ---
 
+# Golden Tests
+
+This folder contains all input/output pairs used for final validation.
+
+Each test follows the format:
+- `exNN.input.txt` → original text
+- `exNN.expected.txt` → expected output
+- `exNN.result.txt` → produced by running the program
+
+Run comparison:
+```bash
+go run ./cmd/go-reloaded tests/golden/exNN.input.txt tests/golden/exNN.result.txt
+diff -u tests/golden/exNN.result.txt tests/golden/exNN.expected.txt
+
+## 🧪 Golden Test Reference
+
+For detailed examples of all input/output pairs used in validation,  
+see the full list in [`tests/golden/Golden Tests.md`](./tests/golden/Golden%20Tests.md).
+
+This file documents:
+- All transformation types (numbers, casing, punctuation, articles)
+- Edge cases and combined directives
+- Expected outputs for auditor verification
+
 ## 🧪 Running Tests
 
 You can manually test the tool using sample files:
