@@ -8,6 +8,8 @@ import (
 
 // ApplyCasing applies casing transformations like (up), (low), (cap)
 // and their numbered variants (up, 2), etc.
+// ApplyCasing applies casing transformations like (up), (low), (cap)
+// and their numbered variants (up, 2), etc.
 func ApplyCasing(tokens []Token) []Token {
 	out := make([]Token, 0, len(tokens))
 
@@ -19,23 +21,28 @@ func ApplyCasing(tokens []Token) []Token {
 			continue
 		}
 
-		// Try to parse directive
 		mode, count, ok := parseCasingDirective(t.Value)
 		if !ok {
-			// Not a casing directive, keep as-is
 			out = append(out, t)
 			continue
 		}
 
-		// Apply transformation backwards to previous "count" Word tokens
+		// ✅ Count Words **and Numbers** as "previous tokens",
+		//    but only transform Words (strings), not Numbers.
 		applied := 0
 		for j := len(out) - 1; j >= 0 && applied < count; j-- {
-			if out[j].Type == Word {
+			switch out[j].Type {
+			case Word:
 				out[j].Value = applyCaseMode(out[j].Value, mode)
 				applied++
+			case Number:
+				// μην αλλάξεις το νούμερο, απλά μέτρα το
+				applied++
+			default:
+				// αγνόησε spaces, punctuation, directives
 			}
 		}
-		// Skip adding the directive itself
+		// δεν προσθέτουμε το directive
 	}
 
 	return out

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"go-reloaded/pkg/transform"
 )
@@ -23,6 +24,8 @@ func main() {
 	}
 
 	out := transform.Transform(string(data))
+
+	out = strings.TrimRight(out, "\r\n") + "\n"
 
 	if err := os.WriteFile(outPath, []byte(out), 0o644); err != nil {
 		fmt.Println("error writing output:", err)

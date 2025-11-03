@@ -87,19 +87,19 @@ Expected: an elephant
 **Example 13**
 ```
 Input: a eagle , with 1F (hex) eggs (up,3) , she said .
-Expected: AN EAGLE, WITH 31 EGGS, SHE said.
+Expected: an eagle, WITH 31 EGGS, she said.
 ```
 
 **Example 14**
 ```
 Input: a owl (up,3) , with 1A (hex) eggs .
-Expected: AN OWL, WITH 26 EGGS.
+Expected: AN OWL, with 26 eggs.
 ```
 
 **Example 15**
 ```
 Input: 10 (bin) birds sat on a branch (up,5) !
-Expected: 2 BIRDS SAT ON AN BRANCH!
+Expected: 2 BIRDS SAT ON A BRANCH!
 ```
 
 **Example 16**
@@ -108,3 +108,28 @@ Input: ' a eagle and a apple ' (up,4)
 Expected: 'AN EAGLE AND AN APPLE'
 ```
 
+## Auditors Examples
+
+**Example 17**
+```
+Input: If I make you BREAKFAST IN BED (low, 3) just say thank you instead of: how (cap) did you get in my house (up, 2) ?.
+Expected: If I make you breakfast in bed just say thank you instead of: How did you get in MY HOUSE?
+```
+
+**Example 18**
+```
+Input: I have to pack 101 (bin) outfits. Packed 1a (hex) just to be sure.
+Expected: I have to pack 5 outfits. Packed 26 just to be sure.
+```
+
+**Example 19**
+```
+Input: Don not be sad ,because sad backwards is das . And das not good.
+Expected: Don not be sad, because sad backwards is das. And das not good.
+```
+
+**Example 20**
+```
+Input: harold wilson (cap, 2) : ' I am a optimist ,but a optimist who carries a raincoat . '
+Expected: Harold Wilson: 'I am an optimist, but an optimist who carries a raincoat.'
+```

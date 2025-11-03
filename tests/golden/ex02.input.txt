@@ -1,0 +1,1 @@
+FF (hex) and 1111 (bin)

@@ -6,22 +6,22 @@ import (
 )
 
 // ApplyArticles turns "a" into "an" when the next word starts with a vowel or 'h'.
+// Διατηρεί την κεφαλαιοποίηση: "A" -> "AN", "a" -> "an".
 func ApplyArticles(tokens []Token) []Token {
 	out := make([]Token, 0, len(tokens))
 
 	for i := 0; i < len(tokens); i++ {
 		t := tokens[i]
 
-		// Εξετάζουμε μόνο Word tokens που είναι "a" (ή "A")
+		// μόνο για Word tokens που είναι "a" ή "A"
 		if t.Type == Word && strings.EqualFold(t.Value, "a") {
-			// βρες το επόμενο word token (αγνόησε spaces & punctuation & directives)
-			nextWord := findNextWord(tokens, i+1)
+			nextWord := findNextWord(tokens, i+1) // αγνοεί spaces/punct/directives
 			if nextWord != "" {
 				first := []rune(nextWord)[0]
 				if isVowelOrH(first) {
-					// διατήρηση κεφαλαίου αν ήταν "A"
+					// ✅ διατήρηση κεφαλαίων
 					if t.Value == "A" {
-						out = append(out, Token{Value: "An", Type: Word})
+						out = append(out, Token{Value: "AN", Type: Word})
 					} else {
 						out = append(out, Token{Value: "an", Type: Word})
 					}
@@ -43,7 +43,7 @@ func findNextWord(tokens []Token, start int) string {
 	for j := start; j < len(tokens); j++ {
 		switch tokens[j].Type {
 		case Word:
-			// μπορεί να έχει μπροστά quote, π.χ. "'apple"
+			// αφαίρεσε τυχόν αρχικά quotes από τη λέξη (π.χ. "'apple" -> "apple")
 			return trimLeadingQuotes(tokens[j].Value)
 		case Space, Punctuation, Directive:
 			continue
