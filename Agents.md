@@ -68,6 +68,7 @@ go-reloaded/
  ├─ pkg/transform/      # transformation logic (pipeline + stages)
  ├─ tests/golden/       # input/output golden files for verification
  ├─ README.md           # human-readable guide
+ ├─ Prompt.md           # example prompt to give to AI 
  ├─ analysis.md         # detailed rules and examples
  ├─ PLAN.md             # system design & architecture plan
  └─ AGENTS.md           # (this file)
