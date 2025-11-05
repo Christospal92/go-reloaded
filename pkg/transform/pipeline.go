@@ -12,7 +12,7 @@ func Transform(input string) string {
 	tokens = ApplyCasing(tokens)
 	tokens = ApplyArticles(tokens)
 
-	// 3) remove any leftover directives (safety) — πριν το format
+	// 3) remove any leftover directives (safety) — before the format
 	clean := make([]Token, 0, len(tokens))
 	for _, tk := range tokens {
 		if tk.Type == Directive {
@@ -29,14 +29,14 @@ func Transform(input string) string {
 }
 
 // Detokenize converts tokens back into a string.
-// Γράφει ακριβώς ένα space για κάθε Space token
-// και απλώς ενώνει τα υπόλοιπα όπως είναι.
+// Write exactly one space for every Space token
+// and just connects the rest as they are.
 func Detokenize(tokens []Token) string {
 	var sb strings.Builder
 
 	for _, tk := range tokens {
 		if tk.Type == Space {
-			// γράψε ένα και μόνο space
+			// write only one space
 			sb.WriteByte(' ')
 			continue
 		}

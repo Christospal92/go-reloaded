@@ -13,24 +13,24 @@ func ApplyNumbers(tokens []Token) []Token {
 	for i := 0; i < len(tokens); i++ {
 		t := tokens[i]
 
-		// αν ΔΕΝ είναι directive, απλώς το περνάμε στο out
+		// if it's not directive, just we put them in the out
 		if t.Type != Directive {
 			out = append(out, t)
 			continue
 		}
 
-		// εδώ ξέρουμε ότι είναι directive → πρέπει να δούμε αν είναι (hex) ή (bin)
+		// here we know that there is directive → we have to check if there is (hex) or (bin)
 		_, base, ok := parseNumberDirective(t.Value)
 		if !ok {
-			// δεν είναι αριθμητικό directive, κράτα το ως έχει
+			// they are not directive, keep it as it is
 			out = append(out, t)
 			continue
 		}
 
-		// βρες το προηγούμενο Word/Number token στο out
+		// find the previous Word/Number token to out
 		for j := len(out) - 1; j >= 0; j-- {
 			if out[j].Type == Word || out[j].Type == Number {
-				// προσπαθούμε να κάνουμε parse το κείμενο
+				// we try to do parse in the text
 				dec, err := strconv.ParseInt(out[j].Value, base, 64)
 				if err == nil {
 					out[j].Value = strconv.FormatInt(dec, 10)
@@ -40,7 +40,7 @@ func ApplyNumbers(tokens []Token) []Token {
 			}
 		}
 
-		// ΔΕΝ προσθέτουμε το directive στο out → το “τρώμε”
+		// we don't try the directive to out → we cut it down
 	}
 
 	return out

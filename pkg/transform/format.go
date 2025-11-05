@@ -2,13 +2,13 @@ package transform
 
 // ApplyFormat normalizes spaces around punctuation and quotes.
 func ApplyFormat(tokens []Token) []Token {
-	// 1) πρώτα διορθώνουμε τα σημεία στίξης
+	// 1) First, we correct the punction
 	toks := attachPunctuation(tokens)
 
-	// 2) μετά διορθώνουμε τα quotes
+	// 2) After, we correct the quotes
 	toks = fixQuotes(toks)
 
-	// 3) συμπίεση κενών (ΝΕΟ)
+	// 3) Compressing spaces
 	toks = compressSpaces(toks)
 	return toks
 }
@@ -21,16 +21,16 @@ func attachPunctuation(tokens []Token) []Token {
 	for i := 0; i < len(tokens); i++ {
 		t := tokens[i]
 
-		// 1) Ό,τι δεν είναι punctuation περνάει όπως είναι
+		// 1) Whatever is not punctuation stays as it is
 		if t.Type != Punctuation {
 			out = append(out, t)
 			continue
 		}
 
-		// 2) ΠΡΙΝ βάλουμε punctuation, καθάρισε ΟΛΑ τα προηγούμενα spaces
-		//    ΕΚΤΟΣ από την ειδική περίπτωση ": " πριν από opening quote (')
+		// 2) Before we put punctuation, clean all the previous spaces
+		//    Except from this special situation ": " before the opening quote (')
 		if t.Value == "'" {
-			// διατήρησε το space αν ακριβώς πριν είναι ":" + space
+			// keep space if before it is ":" + space
 			if !(len(out) >= 2 &&
 				out[len(out)-1].Type == Space &&
 				out[len(out)-2].Type == Punctuation && out[len(out)-2].Value == ":") {
@@ -44,51 +44,51 @@ func attachPunctuation(tokens []Token) []Token {
 			}
 		}
 
-		// 3) Πρόσθεσε το τρέχον punctuation
+		// 3) Add the following punctuation
 		out = append(out, t)
 
-		// 4) Ειδικός κανόνας για το ":" → ΠΑΝΤΑ ακριβώς ένα space μετά
+		// 4) Special rule for the ":" → Always exactly one space after
 		if t.Value == ":" {
-			// αν το επόμενο token είναι Space → κατανάλωσέ το
+			// if the next token is Space → consume it
 			if i+1 < len(tokens) && tokens[i+1].Type == Space {
 				i++
 			}
-			// βάλε ΑΚΡΙΒΩΣ ένα space μετά από ':'
+			// put exactly one space after the ':'
 			out = append(out, Token{Value: " ", Type: Space})
-			// προχώρα στον επόμενο κύκλο (μην εφαρμόσεις άλλο spacing logic)
+			// move to the next cicle (dont use another spacing logic)
 			continue
 		}
 
-		// 5) Αν υπάρχει επόμενο token, δες πώς θα χειριστείς spacing/ιδιαιτερότητες
+		// 5) if there is anohter token, check how you will use spacing/features
 		if i+1 < len(tokens) {
 			next := tokens[i+1]
 
-			// (A) "?." ή "!." → πέτα την τελεία
+			// (A) "?." or "!." → remove the full stop
 			if (t.Value == "?" || t.Value == "!") && next.Type == Punctuation && next.Value == "." {
 				i++ // skip "."
 				continue
 			}
 
-			// (B) Γενικός κανόνας spacing ανάλογα με το επόμενο token
+			// (B) General rule spacing depending on the next token
 			if next.Type == Space {
-				// Αν μετά το space ακολουθεί punctuation ΚΑΙ ΔΕΝ είναι opening quote,
-				// κόψε το space (π.χ. "BAMM !!")
+				// If the space is followed by punctuation AND it is NOT an opening quote
+				// cut the space (for example "BAMM !!")
 				if i+2 < len(tokens) && tokens[i+2].Type == Punctuation && tokens[i+2].Value != "'" {
-					i++ // φάε το space
+					i++ // cut the space
 					continue
 				}
-				// αλλιώς κράτα ΕΝΑ space
+				// otherwise keep one space
 				i++
 				out = append(out, Token{Value: " ", Type: Space})
 
 			} else if next.Type == Punctuation {
-				// ΕΞΑΙΡΕΣΗ: αν αμέσως μετά ακολουθεί opening quote ('), βάλε space πριν από το quote
+				// Exception: if an opening quote (') immediately follows, add a space before the quote.
 				if next.Value == "'" {
 					out = append(out, Token{Value: " ", Type: Space})
 				}
-				// διαφορετικά: δεν βάζουμε space (για "!!", "...", "!?")
+				// otherwise: we don't put space ( "!!", "...", "!?")
 			} else {
-				// επόμενο είναι λέξη → βάλε space
+				// next will be a word → put space
 				out = append(out, Token{Value: " ", Type: Space})
 			}
 		}
@@ -116,7 +116,7 @@ func fixQuotes(tokens []Token) []Token {
 		out = append(out, t)
 		i++
 
-		// αν έχει space αμέσως μετά το άνοιγμα → τρώμε το space
+		// If there is a space immediately after the opening → consume the space.
 		if i < len(tokens) && tokens[i].Type == Space {
 			i++
 		}
@@ -124,13 +124,13 @@ func fixQuotes(tokens []Token) []Token {
 		// πρόσθεσε ό,τι υπάρχει μέχρι να βρούμε closing quote
 		startInner := len(out)
 		for i < len(tokens) {
-			// αν βρήκαμε closing quote
+			// if we fing closing quote
 			if tokens[i].Type == Punctuation && tokens[i].Value == "'" {
-				// αν πριν το κλείσιμο έχει space → σβήστο
+				// if before the closure there is space → erase it
 				if len(out) > startInner && out[len(out)-1].Type == Space {
 					out = out[:len(out)-1]
 				}
-				// βάλτο
+				// put
 				out = append(out, tokens[i])
 				i++
 				break

@@ -6,20 +6,20 @@ import (
 )
 
 // ApplyArticles turns "a" into "an" when the next word starts with a vowel or 'h'.
-// Διατηρεί την κεφαλαιοποίηση: "A" -> "AN", "a" -> "an".
+// Keeps the capitalization: "A" -> "AN", "a" -> "an".
 func ApplyArticles(tokens []Token) []Token {
 	out := make([]Token, 0, len(tokens))
 
 	for i := 0; i < len(tokens); i++ {
 		t := tokens[i]
 
-		// μόνο για Word tokens που είναι "a" ή "A"
+		// Only for Word tokens which are "a" ή "A"
 		if t.Type == Word && strings.EqualFold(t.Value, "a") {
-			nextWord := findNextWord(tokens, i+1) // αγνοεί spaces/punct/directives
+			nextWord := findNextWord(tokens, i+1) // ignore spaces/punct/directives
 			if nextWord != "" {
 				first := []rune(nextWord)[0]
 				if isVowelOrH(first) {
-					// ✅ διατήρηση κεφαλαίων
+					// ✅ Keeps capital
 					if t.Value == "A" {
 						out = append(out, Token{Value: "AN", Type: Word})
 					} else {
@@ -30,7 +30,7 @@ func ApplyArticles(tokens []Token) []Token {
 			}
 		}
 
-		// default: κράτα το token ως έχει
+		// default: keep the token as it be
 		out = append(out, t)
 	}
 
@@ -43,7 +43,7 @@ func findNextWord(tokens []Token, start int) string {
 	for j := start; j < len(tokens); j++ {
 		switch tokens[j].Type {
 		case Word:
-			// αφαίρεσε τυχόν αρχικά quotes από τη λέξη (π.χ. "'apple" -> "apple")
+			// take out quotes from the word (for example "'apple" -> "apple")
 			return trimLeadingQuotes(tokens[j].Value)
 		case Space, Punctuation, Directive:
 			continue

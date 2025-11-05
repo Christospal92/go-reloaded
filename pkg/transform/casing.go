@@ -8,8 +8,6 @@ import (
 
 // ApplyCasing applies casing transformations like (up), (low), (cap)
 // and their numbered variants (up, 2), etc.
-// ApplyCasing applies casing transformations like (up), (low), (cap)
-// and their numbered variants (up, 2), etc.
 func ApplyCasing(tokens []Token) []Token {
 	out := make([]Token, 0, len(tokens))
 
@@ -27,7 +25,7 @@ func ApplyCasing(tokens []Token) []Token {
 			continue
 		}
 
-		// ✅ Count Words **and Numbers** as "previous tokens",
+		//    Count Words **and Numbers** as "previous tokens",
 		//    but only transform Words (strings), not Numbers.
 		applied := 0
 		for j := len(out) - 1; j >= 0 && applied < count; j-- {
@@ -39,10 +37,10 @@ func ApplyCasing(tokens []Token) []Token {
 				// μην αλλάξεις το νούμερο, απλά μέτρα το
 				applied++
 			default:
-				// αγνόησε spaces, punctuation, directives
+				// ignore spaces, punctuation, directives
 			}
 		}
-		// δεν προσθέτουμε το directive
+		// we dont add the directive
 	}
 
 	return out
