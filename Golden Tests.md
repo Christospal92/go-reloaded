@@ -153,3 +153,11 @@ Expected: He said: ''
 Input: Go BIG Or Go Home (low, 10) !
 Expected: go big or go home!
 ```
+
+## Paragrahp text example 
+
+**Example 24**
+```
+Input: it (cap) was the best of times, it was the worst of times (up) , it was a hour of wisdom, it was an age of foolishness (cap, 6) , it was a epoch of belief (low, 3) , it was an season of Light, it was a season of darkness (cap, 2) , 1E (hex) was a spring of hope, 10 (bin) was a winter of despair.
+Expected: It was the best of times, it was the worst of TIMES, it was an hour of wisdom, It Was An Age Of Foolishness, it was an epoch of belief, it was an season of Light, it was a season Of Darkness, 30 was a spring of hope, 2 was a winter of despair.
+```
